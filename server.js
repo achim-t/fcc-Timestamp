@@ -12,26 +12,23 @@ const app = express()
 app.use(express.static('public'))
 
 // http://expressjs.com/en/starter/basic-routing.html
-app.get("/", (request, response) => {
-  response.sendFile(__dirname + '/views/index.html')
+app.get("/:timestamp", (request, response) => {
+  
+
+    let timestampString = request.params.timestamp
+    let timestamp = parseInt(timestampString) || timestampString
+    var time = new Date(timestamp) 
+    
+  let locale = "en-us"
+  var natural = null
+  if (! isNaN( time.getTime() )) {
+    natural = time.toLocaleString(locale, { month: "long", day: "numeric", year: "numeric" });
+  }
+  let result = {unix: time.getTime(), natural: natural}
+  //let result = {unix: time, natural: natural}
+  response.end(JSON.stringify(result))
 })
 
-// Simple in-memory store
-const dreams = [
-  "Find and count some sheep",
-  "Climb a really tall mountain",
-  "Wash the dishes"
-]
-
-app.get("/dreams", (request, response) => {
-  response.send(dreams)
-})
-
-// could also use the POST body instead of query string: http://expressjs.com/en/api.html#req.body
-app.post("/dreams", (request, response) => {
-  dreams.push(request.query.dream)
-  response.sendStatus(200)
-})
 
 // listen for requests :)
 const listener = app.listen(process.env.PORT, () => {
